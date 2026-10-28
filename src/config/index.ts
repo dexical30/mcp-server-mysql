@@ -78,7 +78,7 @@ function readPasswordFromOp(reference: string, opBin = "op"): string {
   }
 }
 
-export const MCP_VERSION = "2.0.2";
+export const MCP_VERSION = "2.1.0";
 
 // @INFO: Load environment variables from .env file
 dotenv.config();
@@ -239,7 +239,7 @@ export const isMultiDbMode =
 
 export const mcpConfig = {
   server: {
-    name: "@benborla29/mcp-server-mysql",
+    name: "@dexical30/mcp-server-mysql",
     version: MCP_VERSION,
     connectionTypes: ["stdio", "streamableHttp"],
   },
