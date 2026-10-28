@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import * as fs from "fs";
+import { execFileSync } from "child_process";
 import { SchemaPermissions } from "../types/index.js";
 import { parseSchemaPermissions, parseMySQLConnectionString } from "../utils/index.js";
 
@@ -49,6 +50,34 @@ function readCACertificate(filePath: string): Buffer {
   return readSSLFile(filePath, 'CA certificate');
 }
 
+/**
+ * Resolve a 1Password secret reference by running `op read` in-process.
+ * The secret travels over the child's stdout pipe into this process's memory,
+ * so it never appears in our environment block (visible via `ps eww`).
+ * @param reference - 1Password secret reference (op://vault/item/field)
+ * @param opBin - Path to the 1Password CLI binary
+ * @returns The secret value
+ * @throws Error if the reference is invalid or `op read` fails
+ */
+function readPasswordFromOp(reference: string, opBin = "op"): string {
+  if (!reference.startsWith("op://")) {
+    throw new Error(`1Password secret reference must start with op://, got: ${reference}`);
+  }
+  try {
+    // execFileSync (no shell) so references containing spaces are passed verbatim.
+    // Generous timeout: the user may need to approve a Touch ID prompt.
+    return execFileSync(opBin, ["read", "--no-newline", reference], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      timeout: 60000,
+    });
+  } catch (error) {
+    const err = error as Error & { stderr?: string };
+    const detail = err.stderr?.trim() || err.message;
+    throw new Error(`Failed to read MySQL password from 1Password (${reference}): ${detail}`);
+  }
+}
+
 export const MCP_VERSION = "2.0.2";
 
 // @INFO: Load environment variables from .env file
@@ -59,6 +88,17 @@ dotenv.config();
 const connectionStringConfig = process.env.MYSQL_CONNECTION_STRING
   ? parseMySQLConnectionString(process.env.MYSQL_CONNECTION_STRING)
   : {};
+
+// @INFO: Resolve the MySQL password once. Connection string wins; otherwise
+// MYSQL_PASS is used, and an op:// value is resolved via the 1Password CLI so
+// the plaintext password never enters the env block.
+const rawMysqlPass = process.env.MYSQL_PASS ?? "";
+const mysqlPassword: string =
+  connectionStringConfig.password !== undefined
+    ? connectionStringConfig.password
+    : rawMysqlPass.startsWith("op://")
+      ? readPasswordFromOp(rawMysqlPass, process.env.MYSQL_OP_PATH || "op")
+      : rawMysqlPass;
 
 // @INFO: Update the environment setup to ensure database is correctly set
 if (process.env.NODE_ENV === "test" && !process.env.MYSQL_DB) {
@@ -214,12 +254,7 @@ export const mcpConfig = {
           port: connectionStringConfig.port || Number(process.env.MYSQL_PORT || "3306"),
         }),
     user: connectionStringConfig.user || process.env.MYSQL_USER || "root",
-    password:
-      connectionStringConfig.password !== undefined
-        ? connectionStringConfig.password
-        : process.env.MYSQL_PASS === undefined
-          ? ""
-          : process.env.MYSQL_PASS,
+    password: mysqlPassword,
     database: connectionStringConfig.database || process.env.MYSQL_DB || undefined, // Allow undefined database for multi-DB mode
     connectionLimit: 10,
     waitForConnections: true,
@@ -228,14 +263,7 @@ export const mcpConfig = {
     keepAliveInitialDelay: 0,
     connectTimeout: process.env.MYSQL_CONNECT_TIMEOUT ? parseInt(process.env.MYSQL_CONNECT_TIMEOUT, 10) : 10000,
     authPlugins: {
-      mysql_clear_password: () => () =>
-        Buffer.from(
-          connectionStringConfig.password !== undefined
-            ? connectionStringConfig.password
-            : process.env.MYSQL_PASS !== undefined
-              ? process.env.MYSQL_PASS
-              : ""
-        ),
+      mysql_clear_password: () => () => Buffer.from(mysqlPassword),
     },
     ...(process.env.MYSQL_SSL === "true"
       ? {
@@ -283,4 +311,4 @@ export const mcpConfig = {
   },
 };
 
-export { readCACertificate, readSSLFile };
+export { readCACertificate, readSSLFile, readPasswordFromOp };
