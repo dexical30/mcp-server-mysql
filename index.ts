@@ -48,7 +48,7 @@ import { realpathSync } from 'fs';
 log("info", `Starting MySQL MCP server v${version}...`);
 
 // Update tool description to include multi-DB mode and schema-specific permissions
-const toolVersion = `MySQL MCP Server [v${process.env.npm_package_version}]`;
+const toolVersion = `MySQL MCP Server [v${version}]`;
 let toolDescription = `[${toolVersion}] Run SQL queries against MySQL database`;
 
 if (isMultiDbMode) {
@@ -151,33 +151,12 @@ export default function createMcpServer({
   const server = new Server(
     {
       name: "MySQL MCP Server",
-      version: process.env.npm_package_version || "1.0.0",
+      version,
     },
     {
       capabilities: {
         resources: {},
-        tools: {
-          mysql_query: {
-            description: toolDescription,
-            inputSchema: {
-              type: "object",
-              properties: {
-                sql: {
-                  type: "string",
-                  description: "The SQL query to execute",
-                },
-              },
-              required: ["sql"],
-            },
-            annotations: {
-              readOnlyHint: isReadOnly,
-              idempotentHint: isReadOnly,
-              destructiveHint: !isReadOnly,
-              openWorldHint: false,
-              title: "MySQL Query",
-            },
-          },
-        },
+        tools: {},
       },
     },
   );

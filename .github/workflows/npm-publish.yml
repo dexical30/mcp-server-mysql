@@ -20,17 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-          cache: "pnpm"
+          cache: "npm"
+          cache-dependency-path: npm-shrinkwrap.json
 
       # Trusted publishing needs npm CLI >= 11.5.1
       - name: Update npm
@@ -45,14 +41,24 @@ jobs:
             exit 1
           fi
 
+      - name: Verify MCP_VERSION matches package.json version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if ! grep -q "export const MCP_VERSION = \"$PKG_VERSION\";" src/config/index.ts; then
+            echo "MCP_VERSION in src/config/index.ts does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      # npm ci installs exactly what npm-shrinkwrap.json pins (the same tree users
+      # get) and fails if the shrinkwrap is out of sync with package.json.
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build
-        run: pnpm build
+        run: npm run build
 
       - name: Test (unit, no MySQL required)
-        run: pnpm exec vitest run tests/unit/op-password.test.ts
+        run: npx vitest run tests/unit/op-password.test.ts
 
       - name: Publish to NPM
         run: npm publish --access public

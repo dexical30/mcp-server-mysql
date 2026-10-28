@@ -78,10 +78,16 @@ function readPasswordFromOp(reference: string, opBin = "op"): string {
   }
 }
 
-export const MCP_VERSION = "2.1.0";
+// Keep in sync with package.json "version" (checked by the npm-publish workflow)
+export const MCP_VERSION = "2.1.1";
 
-// @INFO: Load environment variables from .env file
-dotenv.config();
+// @INFO: Load environment variables from .env file. Skipped when MYSQL_PASS is a
+// 1Password reference: the server runs from the MCP client's working directory,
+// and an untrusted project's .env could otherwise fill in a missing MYSQL_HOST
+// and receive the resolved password.
+if (!process.env.MYSQL_PASS?.startsWith("op://")) {
+  dotenv.config();
+}
 
 // @INFO: Parse connection string if provided
 // Connection string takes precedence over individual environment variables
