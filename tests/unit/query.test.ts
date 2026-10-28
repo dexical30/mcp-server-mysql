@@ -3,7 +3,7 @@ import {
   executeQuery,
   executeReadOnlyQuery,
   executeWriteQuery,
-} from "../../dist/src/db/index.js";
+} from "../../src/db/index.js";
 
 // Mock environment variables for write operation flags
 vi.stubEnv("ALLOW_INSERT_OPERATION", "false");
