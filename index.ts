@@ -413,17 +413,12 @@ export default function createMcpServer({
 
 /**
 * Checks if the current module is the main module (the entry point of the application).
-* This function works for both ES Modules (ESM) and CommonJS.
+* Compares this module's path with the executed script (ESM).
 * @returns {boolean} - True if the module is the main module, false otherwise.
 */
 const isMainModule = () => {
-  // 1. Standard check for CommonJS
-  // `require.main` refers to the application's entry point module.
-  // If it's the same as the current `module`, this file was executed directly.
-  if (typeof require !== 'undefined' && require.main === module) {
-    return true;
-  }
-  // 2. Check for ES Modules (ESM)
+  // This package is ESM-only (and the bundle defines its own `require`), so
+  // there is no CommonJS `require.main === module` case to check.
   // `import.meta.url` provides the file URL of the current module.
   // `process.argv[1]` provides the path of the executed script.
   if (typeof import.meta !== 'undefined' && import.meta.url && process.argv[1]) {
