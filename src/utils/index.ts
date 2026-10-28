@@ -5,19 +5,11 @@ type LogType = "info" | "error";
 const ENABLE_LOGGING =
   process.env.ENABLE_LOGGING === "true" || process.env.ENABLE_LOGGING === "1";
 
+// All levels go to stderr: in stdio mode stdout is the MCP JSON-RPC channel.
 export function log(type: LogType = "info", ...args: any[]): void {
   if (!ENABLE_LOGGING) return;
 
-  switch (type) {
-    case "info":
-      console.info(...args);
-      break;
-    case "error":
-      console.error(...args);
-      break;
-    default:
-      console.log(...args);
-  }
+  console.error(`[${type}]`, ...args);
 }
 
 // Function to parse schema-specific permissions from environment variables
