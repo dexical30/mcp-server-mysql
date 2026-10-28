@@ -1,6 +1,7 @@
 import { isMultiDbMode } from "./../config/index.js";
 import { log } from "./../utils/index.js";
-import SqlParser, { AST } from "node-sql-parser";
+// MySQL-only build: the default entry bundles every SQL dialect (~2.4MB)
+import SqlParser, { AST } from "node-sql-parser/build/mysql.js";
 
 const { Parser } = SqlParser;
 const parser = new Parser();

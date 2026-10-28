@@ -26,11 +26,12 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
-          cache-dependency-path: npm-shrinkwrap.json
+          cache-dependency-path: package-lock.json
 
-      # Trusted publishing needs npm CLI >= 11.5.1
+      # Trusted publishing needs npm CLI >= 11.5.1. Pin the major so a new
+      # npm release can't change install/publish behavior unannounced.
       - name: Update npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@12
 
       - name: Verify release tag matches package.json version
         if: github.event_name == 'release'
@@ -49,8 +50,8 @@ jobs:
             exit 1
           fi
 
-      # npm ci installs exactly what npm-shrinkwrap.json pins (the same tree users
-      # get) and fails if the shrinkwrap is out of sync with package.json.
+      # npm ci installs exactly what package-lock.json pins and fails if it is out
+      # of sync with package.json. The build bundles these into dist/index.js.
       - name: Install dependencies
         run: npm ci
 

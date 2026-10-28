@@ -79,13 +79,13 @@ const RAW_PII_SUBSTRINGS = [
  */
 async function reloadDbModule(
   env: Record<string, string | undefined>,
-): Promise<typeof import("../../dist/src/db/index.js")> {
+): Promise<typeof import("../../src/db/index.js")> {
   for (const [key, value] of Object.entries(env)) {
     if (value === undefined) delete process.env[key];
     else process.env[key] = value;
   }
   vi.resetModules();
-  return await import("../../dist/src/db/index.js");
+  return await import("../../src/db/index.js");
 }
 
 describe("PII Redaction – integration", () => {
@@ -235,7 +235,7 @@ describe("PII Redaction – integration", () => {
       PII_ALLOW_REFERENCES: "true",
     });
     const { applyPatternMasks } = await import(
-      "../../dist/src/security/redact.js"
+      "../../src/security/redact.js"
     );
 
     const result = await executeReadOnlyQuery<any>(

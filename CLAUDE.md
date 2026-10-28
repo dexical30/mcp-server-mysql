@@ -19,7 +19,7 @@ This is a Model Context Protocol (MCP) server that provides MySQL database acces
 ### Building
 
 ```bash
-# Build TypeScript to dist/
+# Type-check, then bundle the server and its dependencies into dist/index.js
 pnpm build
 
 # Watch mode (auto-rebuild on changes)
@@ -187,7 +187,7 @@ When `IS_REMOTE_MCP=true` and `REMOTE_SECRET_KEY` is set:
 │   ├── unit/                  # Unit tests
 │   ├── integration/           # Integration tests (MySQL required)
 │   └── e2e/                   # End-to-end server tests
-└── dist/                      # Compiled JavaScript output
+└── dist/index.js              # Bundled output (esbuild)
 ```
 
 ## Important Development Notes

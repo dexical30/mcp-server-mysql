@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import {
   executeReadOnlyQuery,
   executeWriteQuery,
-} from "../../../dist/src/db/index.js";
+} from "../../../src/db/index.js";
 
 // Create test environment for schema-specific permissions
 describe("Schema-specific Permissions", () => {

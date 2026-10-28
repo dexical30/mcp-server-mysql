@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import {
   executeReadOnlyQuery,
   executeWriteQuery,
-} from "../../dist/src/db/index.js";
+} from "../../src/db/index.js";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
