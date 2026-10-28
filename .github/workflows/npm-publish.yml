@@ -1,7 +1,10 @@
 name: NPM Publish
 
-# Publishes via npm Trusted Publishing (OIDC): no NPM_TOKEN secret is stored,
-# and npm attaches a provenance attestation linking the package to this run.
+# Stages the release via npm Trusted Publishing (OIDC): no NPM_TOKEN secret is
+# stored, and npm attaches a provenance attestation linking it to this run.
+# The staged version is not installable until a maintainer approves it with
+# 2FA on npmjs.com or `npm stage approve <stage-id>`, so a compromised
+# workflow cannot publish on its own.
 # One-time setup: on npmjs.com → package Settings → Trusted Publisher, add
 # this repository and the workflow filename `npm-publish.yml`.
 
@@ -61,5 +64,5 @@ jobs:
       - name: Test (unit, no MySQL required)
         run: npx vitest run tests/unit/op-password.test.ts
 
-      - name: Publish to NPM
-        run: npm publish --access public
+      - name: Stage release on npm
+        run: npm stage publish --access public
