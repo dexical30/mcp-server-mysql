@@ -7,7 +7,8 @@
 | `MYSQL_HOST` | `127.0.0.1` | MySQL host (ignored if `MYSQL_SOCKET_PATH` set) |
 | `MYSQL_PORT` | `3306` | MySQL port (ignored if `MYSQL_SOCKET_PATH` set) |
 | `MYSQL_USER` | `root` | MySQL username |
-| `MYSQL_PASS` | — | MySQL password |
+| `MYSQL_PASS` | — | MySQL password, or a 1Password reference (`op://vault/item/field`) resolved via `op read` at startup |
+| `MYSQL_OP_PATH` | `op` | Path to the 1Password CLI binary used for `op://` references |
 | `MYSQL_DB` | — | Target database (omit for multi-DB mode) |
 | `MYSQL_SOCKET_PATH` | — | Unix socket path (e.g. `/tmp/mysql.sock`) |
 | `MYSQL_CONNECTION_STRING` | — | MySQL CLI-format connection string (overrides individual settings) |

@@ -1,9 +1,12 @@
 {
-  "name": "@benborla29/mcp-server-mysql",
-  "version": "2.0.9",
+  "name": "@dexical30/mcp-server-mysql",
+  "version": "2.1.0",
   "description": "MCP server for interacting with MySQL databases with write operations support",
   "license": "MIT",
   "author": "Ben Borla (https://github.com/benborla)",
+  "contributors": [
+    "dexical30 (https://github.com/dexical30)"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "module": "index.ts",
@@ -13,8 +16,7 @@
   },
   "files": [
     "dist",
-    "README.md",
-    "assets"
+    "README.md"
   ],
   "scripts": {
     "start": "node dist/index.js",
@@ -86,10 +88,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benborla/mcp-server-mysql.git"
+    "url": "git+https://github.com/dexical30/mcp-server-mysql.git"
   },
   "bugs": {
-    "url": "https://github.com/benborla/mcp-server-mysql/issues"
+    "url": "https://github.com/dexical30/mcp-server-mysql/issues"
   },
-  "homepage": "https://github.com/benborla/mcp-server-mysql"
+  "homepage": "https://github.com/dexical30/mcp-server-mysql"
 }

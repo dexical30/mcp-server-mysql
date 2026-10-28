@@ -1,5 +1,9 @@
 # MCP Server for MySQL
 
+> **This is a fork of [benborla/mcp-server-mysql](https://github.com/benborla/mcp-server-mysql)**, published as `@dexical30/mcp-server-mysql`.
+> It adds [1Password secret reference support](#1password-secret-references) for `MYSQL_PASS`.
+> All credit for the original project goes to Ben Borla and its contributors.
+
 [![MCP Toplist](https://mcptoplist.com/badge/glama%2Fbenborla%2Fmcp-server-mysql.svg)](https://mcptoplist.com/server/glama%2Fbenborla%2Fmcp-server-mysql)
 
 [![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/benborla/mcp-server-mysql)](https://archestra.ai/mcp-catalog/benborla__mcp-server-mysql)
@@ -42,7 +46,7 @@ claude mcp add mcp_server_mysql \
   -e MYSQL_USER="root" \
   -e MYSQL_PASS="your_password" \
   -e MYSQL_DB="your_database" \
-  -- npx @benborla29/mcp-server-mysql
+  -- npx @dexical30/mcp-server-mysql
 ```
 
 **Claude Desktop / other clients:**
@@ -52,7 +56,7 @@ claude mcp add mcp_server_mysql \
   "mcpServers": {
     "mcp_server_mysql": {
       "command": "npx",
-      "args": ["-y", "@benborla29/mcp-server-mysql"],
+      "args": ["-y", "@dexical30/mcp-server-mysql"],
       "env": {
         "MYSQL_HOST": "127.0.0.1",
         "MYSQL_PORT": "3306",
@@ -66,6 +70,26 @@ claude mcp add mcp_server_mysql \
 ```
 
 All write operations are disabled by default. Enable with `ALLOW_INSERT_OPERATION=true`, `ALLOW_UPDATE_OPERATION=true`, `ALLOW_DELETE_OPERATION=true`.
+
+## 1Password Secret References
+
+Set `MYSQL_PASS` to a [1Password secret reference](https://developer.1password.com/docs/cli/secret-reference-syntax/) instead of a plaintext password:
+
+```json
+"env": {
+  "MYSQL_PASS": "op://Private/MySQL Dev/password"
+}
+```
+
+When `MYSQL_PASS` starts with `op://`, the server runs `op read` itself at startup and keeps the password only in memory. The plaintext never enters the process environment, so it does not show up in `ps eww` or in your MCP client config.
+
+Requirements:
+
+- [1Password CLI](https://developer.1password.com/docs/cli/get-started/) (`op`) installed
+- 1Password desktop app → **Settings → Developer → Integrate with 1Password CLI** enabled (approve with Touch ID on startup)
+- If your MCP client can't find `op` on its `PATH` (common for GUI apps), set `MYSQL_OP_PATH`, e.g. `/opt/homebrew/bin/op`
+
+Do **not** wrap the server in `op run`: it would inject the plaintext password into the environment, which is exactly what this avoids.
 
 ## Documentation
 
