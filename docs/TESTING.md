@@ -38,11 +38,3 @@ pnpm test:socket         # socket connection tests
 pnpm test:watch          # watch mode
 pnpm test:coverage       # coverage report
 ```
-
-## Evals
-
-```bash
-OPENAI_API_KEY=your-key npx mcp-eval evals.ts index.ts
-```
-
-No rebuild needed — evals load `index.ts` directly via MCP client. See [MCP Evals docs](https://www.mcpevals.io/docs).
